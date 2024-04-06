@@ -236,10 +236,6 @@ void setup()
 #endif
 
   SetupPrediction(gps, settings);
-
-#ifdef I2C_SLAVE
-  SetupSlave();
-#endif
 }
 
 

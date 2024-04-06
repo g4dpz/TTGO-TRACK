@@ -25,16 +25,9 @@ static volatile unsigned int SentenceCounter=0;
 // #define SERVO_PIN                15      // Cutdown via a servo motor
 // #define CUTDOWN_PIN             25       // This pin made active to cut down from balloon
 #define ENABLE_UPLINK                     // Enables uplink, for which you need to set TDM mode for transmission/reception
-#define I2C_SLAVE                         // Enable I2C slave
 
 #if defined(SERVO_PIN) || defined(CUTDOWN_PIN)
   #define CUTDOWN
-#endif
-
-#ifdef I2C_SLAVE
-  #define I2C_SLAVE_SDA_PIN           21
-  #define I2C_SLAVE_SCL_PIN           22
-  #define I2C_SLAVE_ADDR              0x16        // Comment out to disable I2C slave
 #endif
 
 static AXP20X_Class axp;
