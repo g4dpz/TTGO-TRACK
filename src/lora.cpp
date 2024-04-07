@@ -156,7 +156,7 @@ void AddBytesToFSKBuffer(int MaxBytes);
 char Hex(int Character);
 
 
-int BuildSentence(TGPS gps, TSettings settings, char *TxLine)
+int BuildSentence(TGPS gps, TEN_DOF tenDof, TSettings settings, char *TxLine)
 {
   int Count, i, j;
   unsigned int CRC;
@@ -254,10 +254,27 @@ int BuildSentence(TGPS gps, TSettings settings, char *TxLine)
     {
       sprintf(Temp, "%u", gps.ReceivedCommandCount);
     }
-//    else if ((Field >= 'I') && (Field <= 'N'))
-//    {
-//      sprintf(Temp, "%u", gps.ExtraFields[Field-'I']);
-//    }
+
+#ifdef HAS_BMP280
+    else if (Field == 'I')
+    {
+      sprintf(Temp, "%.1f", tenDof.Temperature);
+    }
+    else if (Field == 'J')
+    {
+      sprintf(Temp, "%.1f", tenDof.Pressure);
+    }
+    else if (Field == 'K')
+    {
+      sprintf(Temp, "%.1f", tenDof.Altitude);
+    }
+  #endif
+
+    else if (Field == 'O')
+    {
+      // Altitude
+      sprintf(Temp, "%ld", gps.MaximumAltitude);
+    }
 
     if (i > 0)
     {
@@ -406,8 +423,6 @@ void setupRFM98(double Frequency, int Mode)
   
   // Go to standby mode
   setMode(RF98_MODE_STANDBY);
-  
-  Serial.println("Setup Complete");
 }
 
 void setFrequency(double Frequency)
@@ -1089,7 +1104,7 @@ void SendLoRaRTTY(TSettings settings, int Length)
   SendingRTTY = 1;
 }
 
-void CheckLoRa(TGPS gps, TSettings settings)
+void CheckLoRa(TGPS gps, TEN_DOF tenDof, TSettings settings)
 {
   CheckFSKBuffer();
 
@@ -1141,7 +1156,7 @@ void CheckLoRa(TGPS gps, TSettings settings)
       if (RTTYCount < settings.RTTYCount)
       {
         // Send RTTY packet
-        PacketLength = BuildSentence(gps, settings, (char *)Sentence);
+        PacketLength = BuildSentence(gps, tenDof, settings, (char *)Sentence);
         Serial.printf("RTTY=%s", Sentence);
         SendLoRaRTTY(settings, PacketLength);    
         #ifdef OLED
@@ -1178,7 +1193,7 @@ void CheckLoRa(TGPS gps, TSettings settings)
           }
           else
           {
-            PacketLength = BuildSentence(gps, settings, (char *)Sentence);
+            PacketLength = BuildSentence(gps, tenDof, settings, (char *)Sentence);
             Serial.printf("LORA=%s", Sentence);
             // Serial.print((char *)Sentence);
             #ifdef OLED

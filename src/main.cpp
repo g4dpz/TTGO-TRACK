@@ -74,6 +74,10 @@
 #include <ESP32Servo.h>
 #endif
 
+#ifdef HAS_BMP280
+#include <DFRobot_BMP280.h>
+#endif
+
 //------------------------------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------------------------------
@@ -112,6 +116,7 @@
 
 struct TSettings settings;
 struct TGPS gps;
+struct TEN_DOF tenDof;
 
 // function prototypes (needed for PlatformIO)
 void LoadSettings();
@@ -122,13 +127,15 @@ void SetupADC();
 void SetupGPS();
 void SetupLoRa(TSettings settings);
 void SetupPrediction(TGPS gps, TSettings settings);
+void SetupBMP280();
 void CheckGPS(TGPS *gps, TSettings settings);
 void CheckCutdown();
-void CheckLoRa(TGPS gps, TSettings settings);
+void CheckLoRa(TGPS gps, TEN_DOF tenDof, TSettings settings);
 void CheckADC(TGPS gps);
 void CheckLEDs();
 void CheckHost();
 void CheckPrediction(TGPS gps, TSettings settings);
+void CheckBMP280(TEN_DOF *tendof);
 void ProcessCommand(char *Line);
 int ProcessGPSCommand(char *Line);
 int ProcessCommonCommand(char *Line);
@@ -150,7 +157,7 @@ void setup()
 
   setCpuFrequencyMhz(80);
   
-  Serial.begin(38400);
+  Serial.begin(115200);
 
   delay(1000);
   
@@ -235,7 +242,13 @@ void setup()
   SetupBMP085();
 #endif
 
+#ifdef HAS_BMP280
+  SetupBMP280();
+#endif
+
   SetupPrediction(gps, settings);
+  
+  Serial.println("Setup Complete");
 }
 
 
@@ -247,7 +260,11 @@ void loop()
   CheckCutdown();
 #endif
 
-  CheckLoRa(gps, settings);
+#ifdef HAS_BMP280
+  CheckBMP280(&tenDof);
+#endif
+
+  CheckLoRa(gps, tenDof, settings);
 
   CheckADC(gps);
    

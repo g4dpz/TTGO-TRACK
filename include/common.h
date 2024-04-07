@@ -25,6 +25,33 @@ static volatile unsigned int SentenceCounter=0;
 // #define SERVO_PIN                15      // Cutdown via a servo motor
 // #define CUTDOWN_PIN             25       // This pin made active to cut down from balloon
 #define ENABLE_UPLINK                     // Enables uplink, for which you need to set TDM mode for transmission/reception
+#define HAS_DFROBOT_TEN_DOF_IMU           // Has the DFRobot 10 DOF IMU
+
+#if defined(HAS_DFROBOT_TEN_DOF_IMU)
+  #define IMU_UPDATE_RATE  100
+  #define IMU_UPDATE_RATE_MS  (1000/IMU_UPDATE_RATE)
+  #define HAS_BMP280  // BMP280 is part of the 10 DOF IMU
+  // #define HAS_Adxl345 // Adxl345 is part of the 10 DOF IMU
+  // #define HAS_ITG3200 // Itg3200 is part of the 10 DOF IMU
+  // #define HAS_HMC5883L // Hmc5883 is part of the 10 DOF IMU
+
+  struct TEN_DOF
+  {
+    float Temperature;
+    float Pressure;
+    float Altitude;
+    float AccelerationX;
+    float AccelerationY;
+    float AccelerationZ;
+    float GyroX;
+    float GyroY;
+    float GyroZ;
+    float MagneticX;
+    float MagneticY;
+    float MagneticZ;
+  };
+
+#endif
 
 #if defined(SERVO_PIN) || defined(CUTDOWN_PIN)
   #define CUTDOWN
